@@ -17,28 +17,57 @@ import weka.core.converters.ConverterUtils.DataSource;
 public class Evaluation
 {
     private Classifier classifier = null;
-    private Instances test = null;
-    private double spearman = 0.0;
+    private Instances test;
+//    private double spearman = 0.0;
     
     private ArrayList<Rank> predictedRank1 = null;
     private ArrayList<Rank> predictedRank2 = null;
     private ArrayList<Rank> actualRank1 = null;
     private ArrayList<Rank> actualRank2 = null;
     
-    public Evaluation(Classifier classifier, Instances test)
+    public Evaluation(Classifier classifier)
     {
         this.classifier = classifier;
-        this.test = test;
-        this.test.setClassIndex(this.test.numAttributes() - 1);
     }
     
-//    public double[] spearman()
-//    {    
-//        double[] result = new double[2];
-//        return result;
-//    }
+    /**
+     * 返回两学期的spearman
+     * @return
+     * @throws Exception
+     */
+    public double[] spearman() throws Exception
+    {
+        if (predictedRank1 == null || actualRank1 == null
+            || predictedRank2 == null || actualRank2 == null)
+            throw new Exception("无法计算，需要先调用evaluateModel");
+        
+        double[] spearman = new double[2];
+        spearman[0] = spearman(predictedRank1, actualRank1);
+        spearman[1] = spearman(predictedRank2, actualRank2);
+        return spearman;
+    }
     
-    public double spearman(ArrayList<Rank> predictedRank, ArrayList<Rank> actualRank) throws Exception
+    /**
+     * 返回指定学期的spearman
+     * @param term
+     * @return
+     * @throws Exception
+     */
+    public double spearman(int term) throws Exception
+    {
+        if ((term == 1 && (predictedRank1 == null || actualRank1 == null))
+            || (term == 2 && (predictedRank2 == null || actualRank2 == null)))
+            throw new Exception("无法计算，需要先调用evaluateModel");
+        
+        double spearman;
+        if (term == 1)
+            spearman = spearman(predictedRank1, actualRank1);
+        else
+            spearman = spearman(predictedRank2, actualRank2);
+        return spearman;
+    }
+    
+    private double spearman(ArrayList<Rank> predictedRank, ArrayList<Rank> actualRank) throws Exception
     {
         if (predictedRank.size() != actualRank.size())
             throw new Exception("排名人数错误");
@@ -54,6 +83,18 @@ public class Evaluation
         
         spearman = 1 - 6.0 * spearman / (n * (n * n - 1));
         return spearman;
+    }
+    
+    /**
+     * 根据提供的测试集计算预测排名和实际排名
+     * @param data
+     * @throws Exception
+     */
+    public void evaluateModel(Instances data) throws Exception
+    {
+        test = data;
+        getPredictedRank();
+        getActualRank();
     }
     
     /**
@@ -298,7 +339,6 @@ public class Evaluation
             @Override
             public int compare(Rank o1, Rank o2)
             {
-                // TODO Auto-generated method stub
                 return o1.stu_no - o2.stu_no;
             }
         };
@@ -313,7 +353,6 @@ public class Evaluation
             @Override
             public int compare(Rank o1, Rank o2)
             {
-                // TODO Auto-generated method stub
                 return o1.rank - o2.rank;
             }
         };
