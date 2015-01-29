@@ -56,6 +56,12 @@ public class Evaluation
         return spearman;
     }
     
+    /**
+     * 生成预测的排名
+     * @param dataName: 第三学期排名,arff文件
+     * @param outputName: 输出文件的名字
+     * @throws Exception
+     */
     public void generateRank(String dataName, String outputName) throws Exception
     {
         Instances data = DataSource.read(dataName);
@@ -89,15 +95,19 @@ public class Evaluation
         reRank(list);
         
         FileWriter fw = new FileWriter(outputName);
-        fw.write("id,rank\n");
+        fw.write("id,rank\r\n");
         for (int i = 0; i < list.size(); ++i)
         {
             Rank r = list.get(i);
-            fw.write(r.stu_no + "," + r.rank + "\n");
+            fw.write(r.stu_no + "," + r.rank + "\r\n");
         }
         fw.close();
     }
     
+    /**
+     * 根据训练好的分类器和测试集得到预测的排名
+     * @throws Exception
+     */
     private void getPredictedRank() throws Exception
     {
         predictedRank1 = new ArrayList<>();
@@ -156,6 +166,11 @@ public class Evaluation
         reRank(predictedRank2);
     }
 
+    /**
+     * 根据训练好的分类器和测试集得到预测的排名
+     * @param term: 获取指定学期的排名
+     * @throws Exception
+     */
     private void getPredictedRank(int term) throws Exception
     {
         if (term < 1 || term > 2)
@@ -212,6 +227,10 @@ public class Evaluation
         sortByStu_no(rank);
     }
     
+    /**
+     * 获取测试集实际排名，需要保证有data/测试/成绩.txt文件
+     * @throws Exception
+     */
     private void getActualRank() throws Exception
     {
         actualRank1 = new ArrayList<>();
@@ -236,6 +255,11 @@ public class Evaluation
         sortByStu_no(actualRank2);
     }
  
+    /**
+     * 获取测试集实际排名，需要保证有data/测试/成绩.txt文件
+     * @param term: 获取指定学期的排名
+     * @throws Exception
+     */
     private void getActualRank(int term) throws Exception
     {
         if (term < 1 || term > 2)
@@ -297,6 +321,7 @@ public class Evaluation
         Collections.sort(list, comp);
     }
     
+    // 测试用，忽略
     public void test() throws Exception
     {
         try
