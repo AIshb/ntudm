@@ -17,7 +17,7 @@ import weka.core.converters.ConverterUtils.DataSource;
 public class Evaluation
 {
     private Classifier classifier = null;
-    private Instances test;
+    private Instances test = null;
 //    private double spearman = 0.0;
     
     private ArrayList<Rank> predictedRank1 = null;
@@ -106,13 +106,14 @@ public class Evaluation
     public void generateRank(String dataName, String outputName) throws Exception
     {
         Instances data = DataSource.read(dataName);
+        data.setClassIndex(data.numAttributes() - 1);
         ArrayList<Rank> list = new ArrayList<>();
         HashMap<Integer, Integer> rank = new HashMap<>();
         HashMap<Integer, Integer> count = new HashMap<>();
 
         for (int i = 0; i < data.numInstances(); ++i)
         {
-            int stu_no = (int)test.instance(i).value(1);
+            int stu_no = (int)data.instance(i).value(1);
             int t_rank = (int)classifier.classifyInstance(data.instance(i));
             
             if (rank.containsKey(stu_no))

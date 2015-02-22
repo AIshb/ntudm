@@ -36,7 +36,7 @@ public class LNRegression
     	    buildClassifier(train);
     	    
     	    Instances test = DataSource.read("data/rank_prediction_test.arff");
-    	    evaluation.Evaluation eval = new Evaluation(linearRegression, test);
+    	    evaluation.Evaluation eval = new Evaluation(linearRegression);
 //    	    eval.test();
     	    eval.generateRank("data/rank_prediction.arff", "data/result.csv");
 	    }
